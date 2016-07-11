@@ -24,7 +24,7 @@ import numpy
 import fitsio
 import astropy.time as apTime
 
-def getSDFitsColumns(sdfitsFileList,colnames,scanlist,ifnum):
+def getSDFitsColumns(sdfitsFileList,colnames,scanlist,ifnum,hdu=None):
     # colnames is a list or an array of column names
     # this follows the Green Bank convention
     # if a given name is not found in the table and exists as a keyword
@@ -37,6 +37,9 @@ def getSDFitsColumns(sdfitsFileList,colnames,scanlist,ifnum):
     for file in sdfitsFileList:
         thisFIO = fitsio.FITS(file)
         for i in range(1,len(thisFIO)):
+            if hdu is not None and i != hdu:
+                continue
+
             if thisFIO[i].get_extname() == "SINGLE DISH":
                 # must recheck columns for each new HDU
                 # translations for use later in reconstructing result
@@ -141,7 +144,7 @@ def getSDFitsColumns(sdfitsFileList,colnames,scanlist,ifnum):
     return result        
 
 
-def get_metadata(sdfitsFileList, scanlist=None, ifnum=None, verbose=4):
+def get_metadata(sdfitsFileList, scanlist=None, ifnum=None, hdu=None, verbose=4):
     """
     Given an sdfits file, return the associated meta information
     for the list of SDFITS files for the given scans and for data
@@ -164,7 +167,7 @@ def get_metadata(sdfitsFileList, scanlist=None, ifnum=None, verbose=4):
                'SITELONG','SITELAT','SITEELEV','FEED','IFNUM']
 
     # need to add ability to ensure that the NCHAN value is the same across all tables
-    colValues = getSDFitsColumns(sdfitsFileList,columns,scanlist,ifnum)
+    colValues = getSDFitsColumns(sdfitsFileList,columns,scanlist,ifnum,hdu)
 
     if len(colValues) == 0:
         if verbose > 1:

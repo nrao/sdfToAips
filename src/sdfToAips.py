@@ -56,6 +56,8 @@ def read_command_line(argv):
                         help="max Tsys value to use")
     parser.add_argument("-z","--mintsys", type=float,
                         help="min Tsys value to use")
+    parser.add_argument("--hdu",type=int,
+                        help="Only find data at this HDU in all FITS files.  Counts from 1",default=None)
     parser.add_argument("SDFITSfiles", type=str, nargs="+",
                         help="The calibrated SDFITS files to use.")
     parser.add_argument("--clobber", default=False, action="store_true",
@@ -245,7 +247,7 @@ def sdfToAips(args):
         print "Loading data ... "
 
     # this does NOT pull in all of the data, just the few columns necessary to procede
-    metaData = get_metadata(args.SDFITSfiles,scanlist=scanlist,ifnum=args.window,verbose=args.verbose)
+    metaData = get_metadata(args.SDFITSfiles,scanlist=scanlist,ifnum=args.window,hdu=args.hdu,verbose=args.verbose)
     if len(metaData) == 0:
         print "There was a problem with the data, nothing to convert"
         sys.exit(-1)
@@ -393,7 +395,7 @@ def sdfToAips(args):
             iStokes = numpy.zeros_like(stokesVals)
 
     # set up the data iterator using these stokes values
-    data_iter = gbt_stokes_iter(args.SDFITSfiles,uniqStokes,scanlist=scanlist,ifnum=metaData['ifnum'],verbose=args.verbose)
+    data_iter = gbt_stokes_iter(args.SDFITSfiles,uniqStokes,scanlist=scanlist,ifnum=metaData['ifnum'],hdu=args.hdu,verbose=args.verbose)
 
 
     if args.verbose > 4:

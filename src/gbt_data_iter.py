@@ -27,7 +27,7 @@ class gbt_data_iter:
     # an iterator for use with GBT calibrated SDFITS files
     # Uses fitsio and allows for optional SCAN number, polarization (CRVAL4) and spectral window (IFNUM) selection.
     
-    def __init__(self, sdfitsFileList, scanlist=None, crval4=None, ifnum=None, iter_row_buffer=100, verbose=4):
+    def __init__(self, sdfitsFileList, scanlist=None, crval4=None, ifnum=None, iter_row_buffer=100, hdu=None, verbose=4):
 
         self.files = sdfitsFileList
 
@@ -37,6 +37,7 @@ class gbt_data_iter:
         self.scanlist = scanlist
         self.crval4 = crval4
         self.ifnum = ifnum
+        self.hdu_selected = hdu
 
         # the current opened file and pointer to location in self.files
         self.fio = None
@@ -97,7 +98,7 @@ class gbt_data_iter:
             # otherwise those are already set to appropriate values at end
 
         while (self.hdu < len(self.fio)):
-            if self.fio[self.hdu].get_extname() == 'SINGLE DISH':
+            if (self.hdu_selected is None or self.hdu == self.hdu_selected) and self.fio[self.hdu].get_extname() == 'SINGLE DISH':
                 # HDU of appropriate type
                 self.nrows = self.fio[self.hdu].get_nrows()
                 if self.nrows > 0:

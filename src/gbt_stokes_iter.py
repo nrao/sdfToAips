@@ -27,13 +27,13 @@ class gbt_stokes_iter:
     # instances, one for each unique CRVAL4 (stokes) values.  Iterates them together.
     # the invidual unique stokes values to use must be known first.
 
-    def __init__(self, sdfitsFileList, stokesList, scanlist=None, ifnum=None, iter_row_buffer=100, verbose=4):
+    def __init__(self, sdfitsFileList, stokesList, scanlist=None, ifnum=None, iter_row_buffer=100, hdu=None, verbose=4):
 
         self.iterList = []
         self.counters = []
 
         for stokes in stokesList:
-            self.iterList.append(gbt_data_iter(sdfitsFileList,scanlist=scanlist,crval4=stokes,ifnum=ifnum,iter_row_buffer=iter_row_buffer,verbose=verbose))
+            self.iterList.append(gbt_data_iter(sdfitsFileList,scanlist=scanlist,crval4=stokes,ifnum=ifnum,iter_row_buffer=iter_row_buffer,hdu=hdu,verbose=verbose))
             self.counters.append(0)
 
         self.nIter = len(stokesList)
