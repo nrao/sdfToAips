@@ -186,11 +186,16 @@ def get_metadata(sdfitsFileList, scanlist=None, ifnum=None, verbose=4):
             # first row, but they're only used informationally
             # and so it's not an error if they vary.  The constant SITE*
             # keywords should ensure that TELESCOP is the same, but we don't check that.
-            if not(numpy.all(colValues[col]==colValues[col][0]) or numpy.all(colValues[col].isnan())):
+            if not(numpy.all(colValues[col]==colValues[col][0]) or numpy.all(numpy.isnan(colValues[col]))):
                 # it varies and not because they're all NaNs
                 if verbose > 1:
-                    print "An SDFITS column expected to be constant was found to not be constant.  Column: %s" % col
-                return result
+                    if col == "DATA_TUNIT":
+                        print "The DATA units vary across multiple SDFITS tables.  Can not continue."
+                    elif col == "DATA_WIDTH":
+                        print "The DATA width (number of channels) varies across multiple SDFITS tables.  Can not continue."
+                    else:
+                        print "An SDFITS column expected to be constant was found to not be constant.  Column: %s" % col
+                return {}
             # their actual values are used later in setting fields in result
         else:
             # save all other columns to result, using lower-case name
